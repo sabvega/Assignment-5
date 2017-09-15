@@ -74,6 +74,8 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
     };
 
     $scope.update = function(isValid) {
+      //reset error 
+      $scope.error = null;
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'articleForm');
@@ -81,6 +83,7 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
         return false;
       }
 
+      //gets id from parameters
       var id = $stateParams.listingId;
 
       /* Create the listing object */
@@ -91,7 +94,7 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
       };
 
       Listings.update(id,listing).then(function(response){
-        //successful update navigates state back to listing.list
+        //successful update navigates back to listing.list state and view
         $state.go('listing.list', { successMessage: 'Listing succesfully updated! '});
       }, function(error){
         //update was not successsful 
@@ -106,6 +109,19 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
     };
 
     $scope.remove = function() {
+      //reset error
+      $scope.error = null;
+      
+      //gets Id from parameters 
+      var id = $stateParams.listingId;
+
+      Listings.delete(id).then(function(response){
+        //if successfully delete then go back to listing.list state and view
+        $state.go('listing.list', {successMessage: 'Listing succesfully deleted!'});
+      }, function(error){
+        //if deletion is not succesful show the appropriate error
+        $scope.error = 'Unable to delete listing!\n' + error;
+      });
       /*
         Implement the remove function. If the removal is successful, navigate back to 'listing.list'. Otherwise, 
         display the error. 
